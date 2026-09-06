@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta de satisfacción</title>
+<style>
+  :root{
+    --teal: #0f5c56;
+    --teal-dark: #0b4642;
+    --star: #14532d;
+    --border: #e3e3e3;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --error: #dc2626;
+    --radius: 10px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background:#fafaf8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    padding: 40px 16px;
+  }
+  .card{
+    max-width: 800px;
+    margin: 0 auto;
+    background:#fff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  h1{
+    font-size: 20px;
+    margin: 0 0 28px;
+  }
+  .question{
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .question .req{
+    color: var(--error);
+  }
+  .block{
+    margin-bottom: 32px;
+  }
+  .stars{
+    display:flex;
+    gap:12px;
+  }
+  .star-btn{
+    flex:1;
+    min-width:0;
+    height:44px;
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .star-btn svg{
+    width:18px;
+    height:18px;
+    stroke: var(--star);
+    fill:none;
+    stroke-width:1.6;
+  }
+  .star-btn.filled svg{
+    fill: var(--star);
+  }
+  .star-btn:hover{
+    border-color: var(--star);
+  }
+  .radio-group{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .radio-option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    font-size:14px;
+    color:#1d4ed8;
+    font-weight:600;
+  }
+  .radio-option input{
+    width:18px;
+    height:18px;
+    accent-color: var(--teal);
+    cursor:pointer;
+  }
+  textarea{
+    width:100%;
+    min-height:110px;
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding:12px;
+    font-family:inherit;
+    font-size:14px;
+    resize:vertical;
+  }
+  textarea:focus, .star-btn:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+  }
+  .actions{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:24px;
+    margin-top: 12px;
+  }
+  .btn-cancel{
+    background:none;
+    border:none;
+    color:#1d4ed8;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .btn-accept{
+    background: var(--teal);
+    color:#fff;
+    border:none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .btn-accept:hover{ background: var(--teal-dark); }
+  .btn-accept:disabled{ opacity:.6; cursor:not-allowed; }
+  .error-msg{
+    color: var(--error);
+    font-size:12px;
+    margin-top:6px;
+    display:none;
+  }
+  .error-msg.show{ display:block; }
+  #status{
+    max-width:800px;
+    margin: 16px auto 0;
+    text-align:center;
+    font-size:14px;
+  }
+  #status.ok{ color: var(--teal); }
+  #status.err{ color: var(--error); }
+  @media (max-width:520px){
+    .card{ padding:24px 18px; }
+    .stars{ gap:8px; }
+    .star-btn{ height:40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Completá los siguientes datos</h1>
+
+  <form id="surveyForm" novalidate>
+    <div class="block">
+      <div class="question">En relación al último contacto que tuviste con nosotros, ¿Cómo evaluarías tu experiencia con la consulta que realizaste? <span class="req">*</span></div>
+      <div class="stars" data-group="experiencia"></div>
+      <div class="error-msg">Este campo es obligatorio.</div>
+    </div>
+
+    <div class="block">
+      <div class="question">¿Pudiste resolver lo que necesitabas? <span class="req">*</span></div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="resolvio" value="SI"> SI</label>
+        <label class="radio-option"><input type="radio" name="resolvio" value="NO"> NO</label>
+      </div>
+      <div class="error-msg">Este campo es obligatorio.</div>
+    </div>
+
+    <div class="block">
+      <div class="question">¿Qué tan sencillo fue resolver lo que necesitabas? <span class="req">*</span></div>
+      <div class="stars" data-group="sencillez"></div>
+      <div class="error-msg">Este campo es obligatorio.</div>
+    </div>
+
+    <div class="block">
+      <div class="question" style="margin-bottom:12px;">Si querés, podés agregarnos un comentario:</div>
+      <textarea id="comentario" name="comentario" placeholder=""></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
+      <button type="submit" class="btn-accept" id="acceptBtn">Aceptar</button>
+    </div>
+  </form>
+</div>
+
+<div id="status"></div>
+
+<script>
+  // ======= CONFIGURACIÓN =======
+  // Pegá acá la URL de tu Google Apps Script Web App (ver instrucciones adjuntas).
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyObgkhYmrAHyFMMgNcOIo-9BCCY5PiGfumeSKl9iFPEtEJmsF7p11xlAfVuEon-Cao/exec";
+  // ==============================
+
+  const STAR_SVG = `<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.7 1.6 6.8-6.2-3.7-6.2 3.7 1.6-6.8L2.2 8.9l6.9-.6L12 2z"/></svg>`;
+
+  const ratings = { experiencia: 0, sencillez: 0 };
+
+  function buildStars(container, groupName){
+    container.innerHTML = "";
+    for(let i=1;i<=5;i++){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "star-btn";
+      btn.dataset.value = i;
+      btn.setAttribute("aria-label", i + " de 5 estrellas");
+      btn.innerHTML = STAR_SVG;
+      btn.addEventListener("click", () => {
+        ratings[groupName] = i;
+        [...container.children].forEach((b, idx) => {
+          b.classList.toggle("filled", idx < i);
+        });
+        container.closest(".block").querySelector(".error-msg").classList.remove("show");
+      });
+      container.appendChild(btn);
+    }
+  }
+
+  document.querySelectorAll(".stars").forEach(el => buildStars(el, el.dataset.group));
+
+  document.querySelectorAll('input[name="resolvio"]').forEach(r => {
+    r.addEventListener("change", () => {
+      r.closest(".block").querySelector(".error-msg").classList.remove("show");
+    });
+  });
+
+  document.getElementById("cancelBtn").addEventListener("click", () => {
+    document.getElementById("surveyForm").reset();
+    ratings.experiencia = 0;
+    ratings.sencillez = 0;
+    document.querySelectorAll(".star-btn").forEach(b => b.classList.remove("filled"));
+    document.querySelectorAll(".error-msg").forEach(e => e.classList.remove("show"));
+    document.getElementById("status").textContent = "";
+    document.getElementById("status").className = "";
+  });
+
+  document.getElementById("surveyForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("status");
+    statusEl.textContent = "";
+    statusEl.className = "";
+
+    let valid = true;
+    const blocks = document.querySelectorAll(".block");
+
+    if(ratings.experiencia === 0){
+      blocks[0].querySelector(".error-msg").classList.add("show");
+      valid = false;
+    }
+    const resolvio = document.querySelector('input[name="resolvio"]:checked');
+    if(!resolvio){
+      blocks[1].querySelector(".error-msg").classList.add("show");
+      valid = false;
+    }
+    if(ratings.sencillez === 0){
+      blocks[2].querySelector(".error-msg").classList.add("show");
+      valid = false;
+    }
+
+    if(!valid) return;
+
+    const acceptBtn = document.getElementById("acceptBtn");
+    acceptBtn.disabled = true;
+    acceptBtn.textContent = "Enviando...";
+
+    const payload = {
+      experiencia: ratings.experiencia,
+      resolvio: resolvio.value,
+      sencillez: ratings.sencillez,
+      comentario: document.getElementById("comentario").value,
+      fecha: new Date().toISOString()
+    };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+      });
+      // Con mode "no-cors" no podemos leer la respuesta, así que asumimos éxito
+      // si el fetch no lanzó un error de red.
+      statusEl.textContent = "¡Gracias! Tu respuesta fue enviada correctamente.";
+      statusEl.className = "ok";
+      document.getElementById("surveyForm").reset();
+      ratings.experiencia = 0;
+      ratings.sencillez = 0;
+      document.querySelectorAll(".star-btn").forEach(b => b.classList.remove("filled"));
+    } catch (err) {
+      statusEl.textContent = "Hubo un problema al enviar tu respuesta. Intentá de nuevo.";
+      statusEl.className = "err";
+    } finally {
+      acceptBtn.disabled = false;
+      acceptBtn.textContent = "Aceptar";
+    }
+  });
+</script>
+
+</body>
+</html>
